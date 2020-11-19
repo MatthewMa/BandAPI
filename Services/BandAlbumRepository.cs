@@ -16,72 +16,122 @@ namespace BandAPI.Services
         }
         public void AddAlbum(Guid bandId, Album album)
         {
-            
+            if (bandId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(bandId));
+            }
+            if (album == null)
+            {
+                throw new ArgumentNullException(nameof(album));
+            }
+            album.BandId = bandId;
+            _context.Albums.Add(album);
         }
 
         public void AddBand(Band band)
         {
-            throw new NotImplementedException();
+            if (band == null)
+            {
+                throw new ArgumentNullException(nameof(band));
+            }
+            _context.Bands.Add(band);
         }
 
         public bool AlbumExists(Guid AlbumId)
         {
-            throw new NotImplementedException();
+            if (AlbumId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(AlbumId));
+            }
+            return _context.Albums.Any(a => a.Id == AlbumId);
         }
 
         public bool BandExists(Guid bandId)
         {
-            throw new NotImplementedException();
+            if (bandId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(bandId));
+            }
+            return _context.Albums.Any(a => a.Id == bandId);
         }
 
         public void DeleteAlbum(Album album)
         {
-            throw new NotImplementedException();
+            if (album == null)
+            {
+                throw new ArgumentNullException(nameof(album));
+            }
+            _context.Albums.Remove(album);
         }
 
         public void DeleteBand(Band band)
         {
-            throw new NotImplementedException();
+            if (band == null)
+            {
+                throw new ArgumentNullException(nameof(band));
+            }
+            _context.Bands.Remove(band);
         }
 
         public Album GetAlbum(Guid bandId, Guid albumId)
         {
-            throw new NotImplementedException();
+            if (bandId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(bandId));
+            }
+            if (albumId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(albumId));
+            }
+            return _context.Albums.Where(a => a.Id == albumId && a.BandId == bandId).FirstOrDefault();
         }
 
         public IEnumerable<Album> GetAlbums(Guid bandId)
         {
-            throw new NotImplementedException();
+            if (bandId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(bandId));
+            }
+            return _context.Albums.Where(a => a.BandId == bandId).OrderBy(a => a.Title).ToList();
+
         }
 
         public Band GetBand(Guid bandId)
         {
-            throw new NotImplementedException();
+            if (bandId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(bandId));
+            }
+            return _context.Bands.Find(bandId);
         }
 
         public IEnumerable<Band> GetBands()
         {
-            throw new NotImplementedException();
+            return _context.Bands.ToList();
         }
 
         public IEnumerable<Band> GetBands(IEnumerable<Guid> bandIds)
         {
-            throw new NotImplementedException();
+            if (bandIds == null)
+            {
+                throw new ArgumentNullException(nameof(bandIds));
+            }
+            return _context.Bands.Where(b => bandIds.Contains(b.Id)).OrderBy(b => b.Name);
         }
 
         public bool Save()
         {
-            throw new NotImplementedException();
+            return (_context.SaveChanges() >= 0);
         }
 
         public void UpdateAlbum(Album album)
         {
-            throw new NotImplementedException();
+            _context.Albums.Update(album);
         }
 
         public void UpdateBand(Band band)
         {
-            throw new NotImplementedException();
+            _context.Bands.Update(band);
         }
     }
 }

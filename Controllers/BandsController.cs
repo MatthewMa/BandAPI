@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BandAPI.Entities;
+using BandAPI.Models;
 using BandAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,17 +23,36 @@ namespace BandAPI.Controllers
         public IActionResult GetBands()
         {
             var bandsFromRepo = _bandAlbumRepository.GetBands();
-            return new JsonResult(bandsFromRepo);
+            if (bandsFromRepo == null)
+            {
+                return NotFound();
+            }
+            var bandsDTO = new List<BandDTO>();
+            foreach (var obj in bandsFromRepo)
+            {
+                bandsDTO.Add(new BandDTO{ 
+                    Id = obj.Id,
+                    Name = obj.Name,
+                    MainGenre = obj.MainGenre,
+                    // FoundedYearsAgo = $"{obj.Founded.ToString()} ({obj.Founded.GetYearsAgo()})"
+                });
+            }
+            return Ok(bandsFromRepo);
         }
-        [HttpGet("{bandId: Guid}")]
+        [HttpGet("{bandId}")]
         public IActionResult GetBand(Guid bandId)
         {
             if (bandId == null)
             {
+                return BadRequest();
+            }          
+            Band band = _bandAlbumRepository.GetBand(bandId);
+            if (band == null)
+            {
                 return NotFound();
             }
-            Band band = _bandAlbumRepository.GetBand(bandId);
-            return new JsonResult(band);
+            return Ok(band);
         }
+
     }
 }

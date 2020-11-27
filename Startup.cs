@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using BandAPI.DbContexts;
 using BandAPI.Services;
 using Microsoft.AspNetCore.Builder;
@@ -32,6 +33,8 @@ namespace BandAPI
                 setupAction.ReturnHttpNotAcceptable = true;
             }).AddXmlDataContractSerializerFormatters();
             services.AddScoped<IBandAlbumRepository, BandAlbumRepository>();
+            // Add Automapper
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddDbContext<BandAlbumContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));

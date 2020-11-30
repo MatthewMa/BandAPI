@@ -1,5 +1,6 @@
 ﻿using BandAPI.DbContexts;
 using BandAPI.Entities;
+using BandAPI.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,6 +118,33 @@ namespace BandAPI.Services
                 throw new ArgumentNullException(nameof(bandIds));
             }
             return _context.Bands.Where(b => bandIds.Contains(b.Id)).OrderBy(b => b.Name);
+        }
+
+        public IEnumerable<Band> GetBands(BandsResourceParameters bandsResourceParameter)
+        {
+            if (bandsResourceParameter == null)
+            {
+                throw new ArgumentException(nameof(bandsResourceParameter));
+            }
+            var mainGenre = bandsResourceParameter.MainGenre;
+            var searchQuery = bandsResourceParameter.SearchQuery;
+            if (string.IsNullOrWhiteSpace(mainGenre) && string.IsNullOrWhiteSpace(searchQuery))                
+            {
+                return GetBands();
+            }
+            var collection = _context.Bands as IQueryable<Band>;
+            if (!string.IsNullOrWhiteSpace(mainGenre))
+            {
+                mainGenre = mainGenre.Trim();
+                collection = collection.Where(b => b.MainGenre.ToUpper() == mainGenre.ToUpper());
+            }
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                collection = collection.Where(b => b.Name.Contains(searchQuery));
+            }
+
+            return collection.ToList();
         }
 
         public bool Save()

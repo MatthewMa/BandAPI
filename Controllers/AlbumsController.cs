@@ -36,6 +36,18 @@ namespace BandAPI.Controllers
         }
 
         [HttpGet("{albumId}")]
+        public ActionResult<AlbumDTO> GetAlbumForBand(Guid bandId, Guid albumId)
+        {
+            if (!_bandAlbumRepository.BandExists(bandId))
+            {
+                return NotFound();
+            }
+            Album album = _bandAlbumRepository.GetAlbum(bandId, albumId);
+            if (album == null)
+                return NotFound();
+            return Ok(_mapper.Map<Album, AlbumDTO>(album));
+        }
+
 
 
     }

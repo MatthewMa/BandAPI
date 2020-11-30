@@ -24,26 +24,6 @@ namespace BandAPI.Controllers
             _mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
         }
-        [HttpGet]
-        public ActionResult<IEnumerable<BandDTO>> GetBands()
-        {
-            var bandsFromRepo = _bandAlbumRepository.GetBands();
-            if (bandsFromRepo == null)
-            {
-                return NotFound();
-            }
-            // var bandsDTO = new List<BandDTO>();
-            /*foreach (var obj in bandsFromRepo)
-            {
-                bandsDTO.Add(new BandDTO{ 
-                    Id = obj.Id,
-                    Name = obj.Name,
-                    MainGenre = obj.MainGenre,
-                    FoundedYearsAgo = $"{obj.Founded.ToString("yyyy")} ({obj.Founded.GetYearsAgo()} years ago)"
-                });              
-            }*/
-            return Ok(_mapper.Map<IEnumerable<BandDTO>>(bandsFromRepo));
-        }
         [HttpGet("{bandId}")]
         public IActionResult GetBand(Guid bandId)
         {
@@ -57,6 +37,16 @@ namespace BandAPI.Controllers
                 return NotFound();
             }
             return Ok(band);
+        }
+
+        [HttpGet]
+        [HttpHead]
+        public ActionResult<IEnumerable<BandDTO>> GetBands([FromQuery] BandsResourceParameters bandsResourceParameter)
+        {
+            IEnumerable<Band> bands = _bandAlbumRepository.GetBands(bandsResourceParameter);
+            if (bands == null)
+                return NotFound();
+            return Ok(_mapper.Map<IEnumerable<Band>, IEnumerable<BandDTO>>(bands));
         }
 
     }

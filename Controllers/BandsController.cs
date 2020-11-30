@@ -24,7 +24,7 @@ namespace BandAPI.Controllers
             _mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
         }
-        [HttpGet("{bandId}")]
+        [HttpGet("{bandId}", Name = "GetBand")]
         public IActionResult GetBand(Guid bandId)
         {
             if (bandId == null)
@@ -47,6 +47,23 @@ namespace BandAPI.Controllers
             if (bands == null)
                 return NotFound();
             return Ok(_mapper.Map<IEnumerable<Band>, IEnumerable<BandDTO>>(bands));
+        }
+
+        [HttpPost]
+        public ActionResult<BandDTO> CreateBand([FromBody] BandCreateDTO band)
+        {
+            var bandEnity = _mapper.Map<Band>(band);
+            _bandAlbumRepository.AddBand(bandEnity);
+            _bandAlbumRepository.Save();
+            var bandToReturn = _mapper.Map<BandDTO>(bandEnity);
+            return CreatedAtRoute("GetBand", new { bandId = bandToReturn.Id }, bandToReturn);
+        }
+
+        [HttpOptions]
+        public IActionResult GetBandsOptions()
+        {
+            Response.Headers.Add("Allow", "GET,POST,DELETE,HEAD,OPTIONS");
+            return Ok();
         }
 
     }

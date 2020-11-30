@@ -35,7 +35,7 @@ namespace BandAPI.Controllers
             return Ok(_mapper.Map<IEnumerable<Album>, IEnumerable<AlbumDTO>>(albumsFromRepo));
         }
 
-        [HttpGet("{albumId}")]
+        [HttpGet("{albumId}", Name = "GetAlbum")]
         public ActionResult<AlbumDTO> GetAlbumForBand(Guid bandId, Guid albumId)
         {
             if (!_bandAlbumRepository.BandExists(bandId))
@@ -48,6 +48,19 @@ namespace BandAPI.Controllers
             return Ok(_mapper.Map<Album, AlbumDTO>(album));
         }
 
+        [HttpPost]
+        public ActionResult<AlbumDTO> CreateAlbumForBand(Guid bandId, [FromBody] AlbumCreateDTO album)
+        {
+            if (!_bandAlbumRepository.BandExists(bandId))
+            {
+                return NotFound();
+            }
+            var albumEntity = _mapper.Map<Entities.Album>(album);
+            _bandAlbumRepository.AddAlbum(bandId, albumEntity);
+            _bandAlbumRepository.Save();
+            var albumReturn = _mapper.Map<AlbumDTO>(albumEntity);
+            return CreatedAtRoute("GetAlbum", new { bandId = bandId, albumId = albumReturn.Id }, albumReturn);
+        }
 
 
     }

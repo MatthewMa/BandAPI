@@ -53,7 +53,7 @@ namespace BandAPI.Services
             {
                 throw new ArgumentNullException(nameof(bandId));
             }
-            return _context.Albums.Any(a => a.Id == bandId);
+            return _context.Bands.Any(a => a.Id == bandId);
         }
 
         public void DeleteAlbum(Album album)

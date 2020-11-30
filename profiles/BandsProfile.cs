@@ -16,6 +16,7 @@ namespace BandAPI.profiles
                     dest => dest.FoundedYearsAgo,
                     opt => opt.MapFrom(src => $"{src.Founded.ToString("yyyy")} ({ src.Founded.GetYearsAgo()}) years ago")
                 );
+            CreateMap<Models.BandCreateDTO, Entities.Band>().ReverseMap();
         }
     }
 }

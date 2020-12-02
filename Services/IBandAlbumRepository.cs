@@ -14,6 +14,7 @@ namespace BandAPI.Services
         void AddAlbum(Guid bandId, Album album);
         void UpdateAlbum(Album album);
         void DeleteAlbum(Album album);
+        void DeleteAlbums(IEnumerable<Album> albums);
 
         IEnumerable<Band> GetBands();
         Band GetBand(Guid bandId);

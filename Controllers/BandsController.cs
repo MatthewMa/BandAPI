@@ -66,5 +66,21 @@ namespace BandAPI.Controllers
             return Ok();
         }
 
+        [HttpDelete("{bandId}")]
+        public ActionResult DeleteBand(Guid bandId)
+        {
+            if (!_bandAlbumRepository.BandExists(bandId))
+                return NotFound();
+            // Look for all related albums
+            IEnumerable<Album> albums = _bandAlbumRepository.GetAlbums(bandId);
+            // Delete all related albums
+            _bandAlbumRepository.DeleteAlbums(albums);
+            // Look for band
+            var band = _bandAlbumRepository.GetBand(bandId);
+            // Delete band
+            _bandAlbumRepository.DeleteBand(band);
+            _bandAlbumRepository.Save();
+            return NoContent();
+        }
     }
 }

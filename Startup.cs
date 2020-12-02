@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 
 namespace BandAPI
 {
@@ -32,7 +33,14 @@ namespace BandAPI
             services.AddControllers(setupAction =>
             {
                 setupAction.ReturnHttpNotAcceptable = true;
-            }).AddXmlDataContractSerializerFormatters();
+            })       
+            // For patch document
+            .AddNewtonsoftJson(setupAction =>
+            {
+                setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            })
+            // For xml support accept/xml header                
+            .AddXmlDataContractSerializerFormatters();
             services.AddScoped<IBandAlbumRepository, BandAlbumRepository>();
             // Add Automapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

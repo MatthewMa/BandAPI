@@ -65,6 +65,15 @@ namespace BandAPI.Services
             _context.Albums.Remove(album);
         }
 
+        public void DeleteAlbums(IEnumerable<Album> albums)
+        {
+            if (albums == null )
+            {
+                throw new ArgumentNullException(nameof(albums));
+            }
+            _context.RemoveRange(albums);
+        }
+
         public void DeleteBand(Band band)
         {
             if (band == null)

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BandAPI.Entities;
+using BandAPI.Helpers;
 using BandAPI.Models;
 using BandAPI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,19 @@ namespace BandAPI.Controllers
                 throw new ArgumentNullException(nameof(mapper));
         }
 
+        [HttpGet("({ids})", Name = "GetBandCollection")]
+        public ActionResult<IEnumerable<BandDTO>> GetBandCollection([FromRoute] 
+            [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
+        {
+            if (ids == null)
+                return BadRequest();
+            var bandEntities = _bandAlbumRepository.GetBands(ids);
+            if (ids.Count() != bandEntities.Count())
+                return NotFound();
+            IEnumerable<BandDTO> bandsForReturn = _mapper.Map<IEnumerable<BandDTO>>(bandEntities);
+            return Ok(bandsForReturn);
+        }
+
         [HttpPost]
         public ActionResult<IEnumerable<BandDTO>> CreateBandCollection(
             [FromBody] IEnumerable<BandCreateDTO> bandCollection)
@@ -34,7 +48,9 @@ namespace BandAPI.Controllers
                 _bandAlbumRepository.AddBand(band);
             }
             _bandAlbumRepository.Save();
-            return Ok();
+            var bandCollectionToReturn = _mapper.Map<IEnumerable<BandDTO>>(bandEntities);
+            var IdsString = string.Join(",", bandCollectionToReturn.Select(a => a.Id));
+            return CreatedAtRoute("GetBandCollection", new { ids = IdsString }, bandCollectionToReturn);
         }
     }
 }

@@ -129,7 +129,7 @@ namespace BandAPI.Services
             return _context.Bands.Where(b => bandIds.Contains(b.Id)).OrderBy(b => b.Name);
         }
 
-        public IEnumerable<Band> GetBands(BandsResourceParameters bandsResourceParameter)
+        public PagedList<Band> GetBands(BandsResourceParameters bandsResourceParameter)
         {
             if (bandsResourceParameter == null)
             {
@@ -137,11 +137,9 @@ namespace BandAPI.Services
             }
             var mainGenre = bandsResourceParameter.MainGenre;
             var searchQuery = bandsResourceParameter.SearchQuery;
-            if (string.IsNullOrWhiteSpace(mainGenre) && string.IsNullOrWhiteSpace(searchQuery))                
-            {
-                return GetBands();
-            }
-            var collection = _context.Bands as IQueryable<Band>;
+            int pageNumber = bandsResourceParameter.PageNumber;
+            int pageSize = bandsResourceParameter.PageSize;          
+            var collection = _context.Bands as IQueryable<Band>;          
             if (!string.IsNullOrWhiteSpace(mainGenre))
             {
                 mainGenre = mainGenre.Trim();
@@ -152,8 +150,7 @@ namespace BandAPI.Services
                 searchQuery = searchQuery.Trim();
                 collection = collection.Where(b => b.Name.Contains(searchQuery));
             }
-
-            return collection.ToList();
+            return PagedList<Band>.Create(collection, pageNumber, pageSize);
         }
 
         public bool Save()
